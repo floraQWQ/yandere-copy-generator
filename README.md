@@ -1,0 +1,1 @@
+# yandere-copy-generator
