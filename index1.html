@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#171116">
+<title>偏执文案生成器</title>
+<style>
+:root{color-scheme:dark;--bg:#100d11;--panel:#1b161d;--panel2:#241b25;--line:#40303f;--text:#f6edf3;--muted:#b9a9b7;--pink:#ef8ab8}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% 0%,#3a1e31 0,transparent 38%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Microsoft YaHei",sans-serif;line-height:1.65}
+main{width:min(1000px,calc(100% - 32px));margin:42px auto 60px}.eyebrow{color:var(--pink);letter-spacing:.18em;font-size:12px}.hero h1{font-size:clamp(30px,5vw,48px);line-height:1.2;margin:8px 0 12px}.hero p{color:var(--muted);max-width:650px;margin:0 0 26px}.layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:18px}.panel{border:1px solid var(--line);background:rgba(27,22,29,.95);border-radius:18px;padding:22px;min-width:0}.panel h2{font-size:16px;margin:0 0 18px}.field{margin-bottom:18px}.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:7px}input,select,textarea{width:100%;background:#120f14;border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--text);font:inherit;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--pink)}.hint,.notice{font-size:12px;color:var(--muted);margin-top:6px}.check{display:flex;gap:9px;align-items:center;color:var(--muted);font-size:13px}.check input{width:auto;accent-color:var(--pink)}button{font:inherit;border:0;border-radius:10px;padding:11px 15px;cursor:pointer}.primary{width:100%;background:linear-gradient(135deg,var(--pink),#c85b91);color:#210f1a;font-weight:750}.secondary{background:var(--panel2);border:1px solid var(--line);color:var(--text)}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1}.result-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.result-head h2{margin:0}.count{font-size:12px;color:var(--muted);white-space:nowrap}.count strong{color:var(--pink);font-size:15px}textarea#output{min-height:360px;resize:vertical;line-height:1.9;font-size:15px}.status{min-height:22px;color:var(--pink);font-size:12px;margin-top:8px}.notice{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}details{margin-top:18px;color:var(--muted);font-size:13px}summary{cursor:pointer;color:var(--text)}.footer{color:#8d7d8b;font-size:12px;text-align:center;margin-top:24px}@media(max-width:760px){main{margin-top:26px}.layout{grid-template-columns:1fr}.panel{padding:18px}textarea#output{min-height:300px}}
+</style>
+</head>
+<body><main>
+<header class="hero"><div class="eyebrow">LOCAL TEXT ENGINE · NO AI API</div><h1>偏执文案生成器</h1><p>从你提供的病娇、占有欲、嫉妒与索取关注类语料中归纳句式，再通过本地规则组合成新文案。无需登录，文本只在当前浏览器中处理。</p></header>
+<div class="layout">
+<section class="panel"><h2>生成设置</h2>
+<div class="field"><label for="length">目标字数</label><input id="length" type="number" min="20" max="5000" step="10" value="300"><div class="hint">按字符计数，不计空格和换行；范围 20–5000。</div></div>
+<div class="field"><label for="style">文案类型</label><select id="style"><option value="random">随机混合</option><option value="possess">占有欲与控制</option><option value="jealous">嫉妒与猜疑</option><option value="attention">索取关注</option><option value="confess">偏执告白</option><option value="dark">黑化独白</option></select></div>
+<label class="check"><input id="questions" type="checkbox" checked> 保留反问句和连续追问语气</label><div style="height:18px"></div>
+<button class="primary" id="generate">生成文案</button><div class="notice">生成方式：句式模板、语料片段、词组替换与重复过滤。纯规则生成；结果尽量贴近目标字数。</div>
+</section>
+<section class="panel"><div class="result-head"><h2>生成结果</h2><div class="count">当前字数 <strong id="count">0</strong></div></div>
+<textarea id="output" placeholder="点击“生成文案”，结果会显示在这里。" spellcheck="false"></textarea>
+<div class="actions"><button class="secondary" id="copy">复制文案</button><button class="secondary" id="again">再生成一版</button><button class="secondary" id="clear">清空</button></div><div class="status" id="status" aria-live="polite"></div>
+<details><summary>语料分析与生成逻辑</summary><p>语料主要包含排他性要求、对他人互动的嫉妒、反复追问与求证、渴望被偏爱、偏执式告白、黑化独白。程序抽取常见表达结构，并按主题采样组合；相同句子不会连续重复。</p><p>当前素材是从你粘贴的文本中归纳出的规则与句式片段。后续可以扩展为可导入 TXT 文案语料的版本。</p></details>
+</section></div><div class="footer">Yandere Copy Generator · Runs locally in your browser</div>
+</main>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const bank={
+possess:[
+"我想知道你所有的行踪，想知道你每一秒在做什么。","你身边的人越来越多，我却只想让你的世界再小一点，小到只剩下我。",
+"我希望你遇到有意思的事，第一个想到的人就是我。","我想成为你最特别的例外，成为你无论如何都不愿放开的人。",
+"我想把你的偏爱留给我，把那些只属于我们的瞬间好好藏起来。","你可以把目光多停留在我身上一会儿吗？",
+"我想知道我在你心里究竟占了多大的位置。","我总想确认，你的在意有没有和我的一样多。",
+"我不喜欢分享你的注意力，哪怕只是很短的一瞬间。","如果可以，我希望你每次回头都能看见我。",
+"我想参与你的生活，想知道你喜欢什么、害怕什么，又会因为什么开心。","你能不能再偏心我一点，把我放在更重要的位置？"
+],
+jealous:[
+"刚才和你说话的人是谁？你们是什么时候认识的？","你为什么给那条动态点赞？是因为你很在意那个人吗？",
+"你说那句话的时候为什么要加句号？是不是不想继续和我聊了？","你有那么多朋友，是不是只有我还在认真等你的消息？",
+"你为什么对别人那么热情，轮到我时却总是惜字如金？","我知道自己想得太多，可我还是忍不住反复回想你说过的每一句话。",
+"你是不是已经习惯了我的存在，所以才不再主动找我？","我总会把一些微不足道的细节想得很重，然后一个人难过很久。",
+"我想问清楚，却又害怕答案和我猜的一样。","为什么你的消息列表里有那么多人，而我还在等你想起我？",
+"是不是我不够有趣，所以你才把时间留给了别人？","我知道每个人都有自己的生活，可我还是会嫉妒那些能轻易得到你关注的人。"
+],
+attention:[
+"你可以站在我身边吗？可以再靠近我一点吗？","可以告诉我，我对你来说究竟有多重要吗？",
+"你能不能主动来找我一次，让我知道你也在期待和我说话？","我只是想听你亲口说，我没有被你忘记。",
+"你能不能把今天遇到的有趣事情也讲给我听？","我想被你需要，想成为你难过时会第一个想到的人。",
+"你可以多告诉我几次，你愿意留在这里吗？","我不需要多么盛大的承诺，只想知道你有没有认真把我放在心上。",
+"你能不能不要总让我猜？有些话你亲口说出来，我才敢相信。","我一直在等你的消息，哪怕只是一个很普通的问候。",
+"我想听你说说今天过得怎么样，开心的事和不开心的事都可以。","你可以让我知道，我在你心里的位置没有悄悄改变吗？"
+],
+confess:[
+"从认识你的那一刻起，我就开始在意那些以前根本不会留心的细节。","我不擅长把喜欢说得漂亮，只知道你的一个回应就能让我反复回味很久。",
+"你是我反复确认、反复惦记，也始终舍不得轻易放下的人。","我想和你分享生活里所有微不足道的小事，也想听你讲那些不愿对别人提起的往事。",
+"如果喜欢也有声音，那我的每一次沉默，大概都在偷偷喊你的名字。","我想记住你的习惯、你的偏好，还有你偶尔流露出来的脆弱。",
+"我想成为你熟悉又特别的存在，让你想到某件事时，会自然地想起我。","我不知道怎样才算足够喜欢一个人，只知道我总想再靠近你一点。",
+"我愿意花很长时间了解你，了解你走过的路，以及你没有说出口的心事。","你对我来说有着很特别的意义，所以我总忍不住想知道，你是否也这样想过。",
+"如果你愿意，我想慢慢走进你的生活，而不是只做一个路过的人。","我想把那些难以启齿的在意都告诉你，也想认真听听你的答案。"
+],
+dark:[
+"我把每一次沉默都记在心里，把没能问出口的话一遍遍重演。","我知道自己的念头越来越偏执，却还是无法轻易停下那些反复确认的冲动。",
+"我一边告诉自己不要在意，一边又忍不住刷新你的动态。","越是得不到明确的答案，我越容易被自己的猜测困住。",
+"我把不安藏进平静的语气里，再假装一切都没有发生。","有时候我甚至分不清，自己究竟是在害怕失去，还是害怕从未被真正选择。",
+"我想装作毫不在乎，可你的每一个细节都能轻易打乱我的情绪。","我反复告诉自己要冷静，最后却还是回到同一个问题：你究竟有没有在意过我？",
+"那些没有说出口的嫉妒和不甘，在安静下来的时候变得格外清晰。","我不想再靠猜测证明自己的重要性，可我又不知道该怎样开口。",
+"我把期待藏得很深，深到连自己都快要忘记，最初只是想得到一句回应。","如果我的在意让你感到窒息，我也该学着把那些失控的念头慢慢放下。"
+]};
+const openers=["我有时候会想，","你知道吗，","其实我一直想问你，","我反复想了很久，","说出来可能有点奇怪，","我明明告诉自己不要多想，可是","每次看到你，","我最在意的事情就是，","我不想再假装无所谓了，","有一件事我始终没能想明白，"];
+const endings=["我只是想知道，你会不会也在意我。","我不想再靠猜测来确认自己的位置。","我希望这一次，你能认真回答我。","你能不能给我一个明确一点的答案？","我只是想成为对你而言特别的那个人。","我会努力把话说清楚，不再让沉默替我回答。","我想听见你的真实想法，而不是自己想象出来的答案。"];
+const transitions=["可我越想越在意。","这件事总让我忍不住反复琢磨。","我知道这样想并不公平，但情绪总比道理来得快。","我想问你，却又怕显得自己太过在意。","每次到了最后，我还是会想起你。","也许我需要的只是一次坦诚的对话。"];
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const count=s=>Array.from(s.replace(/\s/g,"")).length;
+function limitToCount(s,n){let out="",used=0;for(const ch of s){if(/\s/.test(ch)){if(used<n)out+=ch;continue}if(used>=n)break;out+=ch;used++}return out.trim()}
+function endWithFullSentence(s){
+ s=s.trim();
+ if(!s)return s;
+ // 最终句统一以中文句号结束；不截断任何句子。
+ return s.replace(/[。！？!?；;，,、…]+$/,"。");
+}
+function generate(){
+ let target=Math.max(20,Math.min(5000,Math.floor(Number($("length").value)||300)));$("length").value=target;
+ let keys=$("style").value==="random"?Object.keys(bank):[$("style").value],pool=keys.flatMap(k=>bank[k]);
+ let candidates=[...pool,...transitions,...endings];
+ if($("questions").checked){
+  candidates.push(...["你为什么总让我猜你的想法？","我在你心里到底算什么？","你有没有哪怕一次主动想起过我？","你是不是也会在意我和别人说话？","你能不能告诉我，你有没有认真听过我的心事？","为什么我总要等很久，才能等到你的回应？","你会不会也害怕有一天我们变得陌生？"]);
+ }
+ // 只拼接完整句子；任何时候都不切断句子来凑字数。
+ let sentences=[],used=new Set(),current=0,guard=0;
+ while(current<target&&guard++<target*4){
+  let remaining=target-current;
+  let available=candidates.filter(x=>!used.has(x)&&count(x)<=remaining);
+  if(!available.length)break;
+  // 优先从能贴近剩余字数的句子中随机挑选，尽量接近目标字数。
+  let longest=Math.max(...available.map(count));
+  let near=available.filter(x=>count(x)>=Math.max(1,longest-18));
+  let sentence=pick(near);
+  sentences.push(sentence);used.add(sentence);current+=count(sentence);
+ }
+ let finalText=endWithFullSentence(sentences.join(""));
+ // 防止语料句子末尾原本是问号等标点：输出结尾始终为完整句子加中文句号。
+ $("output").value=finalText;
+ $("count").textContent=count(finalText);
+ $("status").textContent=count(finalText)===target?"已生成，字数符合目标，结尾为完整句子。":"已生成完整句子；为避免截断句子，实际字数可能略少于目标。";
+}
+$("generate").addEventListener("click",generate);$("again").addEventListener("click",generate);
+$("clear").addEventListener("click",()=>{$("output").value="";$("count").textContent="0";$("status").textContent=""});
+$("output").addEventListener("input",()=>{$("count").textContent=count($("output").value)});
+$("copy").addEventListener("click",async()=>{let v=$("output").value;if(!v){$("status").textContent="请先生成文案。";return}try{await navigator.clipboard.writeText(v);$("status").textContent="已复制到剪贴板。"}catch{$("output").select();$("status").textContent="浏览器未允许自动复制，请按 Ctrl+C 复制。"}});
+})();
+</script></body></html>
