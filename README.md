@@ -28,25 +28,6 @@ A browser-based Chinese yandere-style text generator powered by a local static c
 4. 点击生成按钮。
 5. 满意后复制生成的文案。
 
-## Deployment | 部署
-
-This project is a static website and can be hosted with GitHub Pages.
-
-本项目为静态网页，可通过 GitHub Pages 部署。
-
-1. Upload `index.html` to the root directory of this repository.
-2. Open **Settings → Pages**.
-3. Under **Build and deployment**, select **Deploy from a branch**.
-4. Choose the `main` branch and the `/ (root)` folder.
-5. Click **Save** and wait for deployment to finish.
-
-部署步骤：
-
-1. 将 `index.html` 上传到仓库根目录。
-2. 打开 **Settings → Pages**。
-3. 在 **Build and deployment** 中选择 **Deploy from a branch**。
-4. 选择 `main` 分支和 `/ (root)` 目录。
-5. 点击 **Save**，等待部署完成。
 
 ## Technology | 技术
 
